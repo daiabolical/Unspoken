@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Write</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family:'Quicksand';
+      background: linear-gradient(135deg,#fff6b3,#ffd6e7);
+      text-align:center;
+      padding:40px;
+      opacity:0;
+      transition:0.4s;
+      margin:0;
+    }
+
+    body.loaded{opacity:1;}
+
+    body.dark{
+      background:#1b1024;
+      color:#f2e9ff;
+    }
+
+    .card{
+      background:white;
+      width:85%;
+      max-width:420px;
+      margin:auto;
+      padding:25px;
+      border-radius:22px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.12);
+      margin-bottom:90px;
+    }
+
+    body.dark .card{
+      background:#2a1633;
+      color:#f2e9ff;
+      box-shadow:0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    h2{
+      margin-top:0;
+    }
+
+    select, textarea{
+      width:95%;
+      border:none;
+      border-radius:12px;
+      padding:12px;
+      font-family:'Quicksand';
+      font-size:14px;
+      outline:none;
+      margin-top:10px;
+    }
+
+    textarea{
+      height:150px;
+      resize:none;
+    }
+
+    button{
+      margin-top:12px;
+      padding:10px 14px;
+      border:none;
+      background:#5a3d5c;
+      color:white;
+      border-radius:12px;
+      cursor:pointer;
+      font-family:'Quicksand';
+      transition:0.2s;
+    }
+
+    button:hover{
+      transform:scale(1.03);
+    }
+
+    .top-actions{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+    }
+
+    /* NAV BAR */
+    .nav{
+      position:fixed;
+      bottom:0;
+      left:0;
+      width:100%;
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      background:rgba(255,255,255,0.85);
+      padding:12px 0;
+      backdrop-filter: blur(10px);
+      box-shadow:0 -5px 20px rgba(0,0,0,0.08);
+    }
+
+    body.dark .nav{
+      background:rgba(30,20,40,0.95);
+      box-shadow:0 -5px 20px rgba(0,0,0,0.4);
+    }
+
+    .nav button{
+      background:none;
+      border:none;
+      font-size:12px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:4px;
+      color:#333;
+      cursor:pointer;
+    }
+
+    body.dark .nav button{
+      color:#f2e9ff;
+    }
+
+    .nav button span{
+      font-size:20px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <h2>💬 Write anonymously</h2>
+
+  <select id="category">
+    <option>Vent</option>
+    <option>Advice</option>
+    <option>Support</option>
+  </select>
+
+  <textarea id="msg" placeholder="Write something..."></textarea>
+
+  <div class="top-actions">
+    <button onclick="post()">Post</button>
+    <button onclick="toggleDark()">🌙</button>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button onclick="go('index.html')">
+    <span>🏠</span>
+    Home
+  </button>
+
+  <button onclick="go('submit.html')">
+    <span>✍️</span>
+    Write
+  </button>
+
+  <button onclick="go('messages.html')">
+    <span>📖</span>
+    Journal
+  </button>
+</div>
+
+<script>
+
+function post(){
+  let m = JSON.parse(localStorage.getItem("messages"))||[];
+
+  m.push({
+    text:msg.value,
+    category:category.value,
+    time:new Date().toLocaleString(),
+    likes:0,hugs:0,sad:0,replies:[],reports:0
+  });
+
+  localStorage.setItem("messages",JSON.stringify(m));
+  msg.value="";
+}
+
+function toggleDark(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",
+    document.body.classList.contains("dark")?"dark":"light");
+}
+
+function go(p){
+  document.body.style.opacity=0;
+  setTimeout(()=>location.href=p,300);
+}
+
+window.onload=()=>{
+  document.body.classList.add("loaded");
+  if(localStorage.getItem("theme")==="dark")
+    document.body.classList.add("dark");
+};
+
+</script>
+
+</body>
+</html>

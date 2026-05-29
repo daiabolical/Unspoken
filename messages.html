@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Feed</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:'Quicksand';
+background:linear-gradient(#fff6c9,#ffd9ea);
+padding:20px;
+padding-bottom:100px;
+}
+
+h2{
+text-align:center;
+color:#5a4a5f;
+}
+
+/* POSTS */
+.post{
+background:white;
+padding:15px;
+margin-bottom:15px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.06);
+}
+
+.category{
+font-weight:bold;
+color:#ff7eb6;
+}
+
+.time{
+font-size:12px;
+opacity:0.6;
+margin-top:5px;
+}
+
+/* REACTIONS */
+.reactions{
+margin-top:10px;
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+}
+
+.reactions button{
+border:none;
+background:#f4f4f4;
+padding:6px 10px;
+border-radius:12px;
+cursor:pointer;
+font-size:14px;
+}
+
+/* REPLIES */
+.reply-box{
+margin-top:10px;
+display:flex;
+gap:5px;
+}
+
+.reply-box input{
+flex:1;
+padding:6px;
+border-radius:8px;
+border:1px solid #ddd;
+outline:none;
+}
+
+.reply-box button{
+border:none;
+background:#5a3d5c;
+color:white;
+padding:6px 10px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.reply{
+font-size:13px;
+background:#f5f5f5;
+padding:6px;
+border-radius:8px;
+margin-top:5px;
+}
+
+/* NAV */
+.nav{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+display:flex;
+justify-content:space-around;
+background:white;
+padding:12px 0;
+box-shadow:0 -3px 10px rgba(0,0,0,0.1);
+}
+
+.nav button{
+background:none;
+border:none;
+font-size:12px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:3px;
+color:#5a4a5f;
+cursor:pointer;
+}
+
+.nav span{
+font-size:20px;
+}
+
+.empty{
+text-align:center;
+opacity:0.6;
+margin-top:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>📖 Feed</h2>
+
+<div id="feed"></div>
+
+<div class="nav">
+  <button onclick="go('index.html')"><span>🏠</span>Home</button>
+  <button onclick="go('submit.html')"><span>✍️</span>Write</button>
+  <button onclick="go('messages.html')"><span>📖</span>Feed</button>
+</div>
+
+<script>
+
+function load(){
+
+let messages = JSON.parse(localStorage.getItem("messages")) || [];
+
+let feed = document.getElementById("feed");
+
+feed.innerHTML = "";
+
+/* newest first */
+messages.reverse();
+
+if(messages.length === 0){
+feed.innerHTML = `<div class="empty">No messages yet 💛</div>`;
+return;
+}
+
+messages.forEach((m, index) => {
+
+feed.innerHTML += `
+<div class="post">
+
+  <div class="category">${m.category}</div>
+  <div>${m.text}</div>
+  <div class="time">${m.time}</div>
+
+  <!-- REACTIONS -->
+  <div class="reactions">
+    ${renderReactions(m,index)}
+  </div>
+
+  <!-- REPLIES -->
+  <div id="replies-${index}">
+    ${(m.replies || []).map(r => `<div class="reply">💬 ${r}</div>`).join("")}
+  </div>
+
+  <div class="reply-box">
+    <input id="reply-${index}" placeholder="Reply...">
+    <button onclick="addReply(${index})">Send</button>
+  </div>
+
+</div>
+`;
+
+});
+
+}
+
+/* EMOJI REACTIONS */
+function renderReactions(m, index){
+
+const emojis = [
+"🫂","☺️","🥹","😳","😭","🫶",
+"🤦‍♀️","😿","😽","🌟","🩷","💛","💞"
+];
+
+return emojis.map(e=>{
+return `
+<button onclick="react(${index},'${e}')">
+${e} ${(m.reactions?.[e] || 0)}
+</button>`;
+}).join("");
+}
+
+/* ADD REACTION */
+function react(i, emoji){
+
+let messages = JSON.parse(localStorage.getItem("messages")) || [];
+
+messages.reverse();
+
+if(!messages[i].reactions){
+messages[i].reactions = {};
+}
+
+messages[i].reactions[emoji] =
+(messages[i].reactions[emoji] || 0) + 1;
+
+messages.reverse();
+
+localStorage.setItem("messages", JSON.stringify(messages));
+
+load();
+}
+
+/* ADD REPLY */
+function addReply(i){
+
+let messages = JSON.parse(localStorage.getItem("messages")) || [];
+
+let input = document.getElementById("reply-" + i);
+
+if(!input.value.trim()) return;
+
+messages.reverse();
+
+messages[i].replies.push(input.value);
+
+messages.reverse();
+
+localStorage.setItem("messages", JSON.stringify(messages));
+
+load();
+}
+
+/* NAV */
+function go(page){
+document.body.style.opacity="0";
+setTimeout(()=>location.href=page,300);
+}
+
+load();
+
+</script>
+
+</body>
+</html>
